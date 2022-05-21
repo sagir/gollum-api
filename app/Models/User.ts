@@ -2,6 +2,8 @@ import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { column, beforeSave, BaseModel, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import RefreshToken from './RefreshToken'
+import Survey from './Survey'
+import Answer from './Answer'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -34,4 +36,10 @@ export default class User extends BaseModel {
 
   @hasMany(() => RefreshToken)
   public refreshTokens: HasMany<typeof RefreshToken>
+
+  @hasMany(() => Survey)
+  public surveys: HasMany<typeof Survey>
+
+  @hasMany(() => Answer)
+  public answers: HasMany<typeof Answer>
 }

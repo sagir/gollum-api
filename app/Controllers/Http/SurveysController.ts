@@ -8,6 +8,7 @@ import { SurveyService } from './../../Services/SurveyService'
 import SurveyValidator from 'App/Validators/SurveyValidator'
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { DateTime } from 'luxon'
+import HttpException from 'App/Exceptions/HttpException'
 
 export default class SurveysController {
   public async index({ request }: HttpContextContract): Promise<ModelPaginatorContract<Survey>> {
@@ -68,6 +69,14 @@ export default class SurveysController {
     const survey = await Survey.query().withCount('questions').where('id', params.id).firstOrFail()
     SurveyService.authorize(survey, auth.user)
     SurveyService.blockIfPublished(survey, 'Survey is already published')
+
+    if (!survey.$extras.questionsCount) {
+      throw new HttpException(
+        'Pleaes add at-least 1 question before publishing it.',
+        400,
+        'E_BAD_REQUEST'
+      )
+    }
 
     await request.validate({
       schema: schema.create({

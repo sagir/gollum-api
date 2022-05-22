@@ -6,6 +6,7 @@ Route.group(() => {
   Route.get('/:id', 'SurveysController.show').as('show')
   Route.put('/:id', 'SurveysController.update').as('update')
   Route.delete('/:id', 'SurveysController.destroy').as('destroy')
+  Route.patch('/:id/publish', 'SurveyController.publish').as('publish')
 })
   .prefix('api/v1/surveys')
   .as('api.v1.surveys')

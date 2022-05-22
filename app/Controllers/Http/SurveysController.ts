@@ -4,7 +4,8 @@ import { SurveySortOptions } from 'App/Enums/SurveySortOptions'
 import { SurveyStatuses } from 'App/Enums/SurveyStatuses'
 import Survey from 'App/Models/Survey'
 import SurveyListRequestValidator from './../../Validators/SurveyListRequestValidator'
-import { SurveyService } from './../../Services/SurveyService';
+import { SurveyService } from './../../Services/SurveyService'
+import CreateSurveyValidator from 'App/Validators/CreateSurveyValidator'
 
 export default class SurveysController {
   public async index({ request }: HttpContextContract): Promise<ModelPaginatorContract<Survey>> {
@@ -18,9 +19,26 @@ export default class SurveysController {
     )
   }
 
-  public async store({}: HttpContextContract) {}
+  public async store({ auth, request, response }: HttpContextContract): Promise<void> {
+    await request.validate(CreateSurveyValidator)
 
-  public async show({}: HttpContextContract) {}
+    const survey = await Survey.create({
+      title: request.input('title'),
+      timeLimit: request.input('timeLimit'),
+      description: request.input('description'),
+      userId: auth.user?.id,
+    })
+
+    response.created(survey)
+  }
+
+  public show({ params }: HttpContextContract): Promise<Survey> {
+    return Survey.query()
+      .preload('user')
+      .preload('questions', (query) => query.preload('options'))
+      .where('id', params.id)
+      .firstOrFail()
+  }
 
   public async update({}: HttpContextContract) {}
 

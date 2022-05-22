@@ -16,7 +16,7 @@ export default class Surveys extends BaseSchema {
         .references('id')
         .inTable('users')
         .onDelete('CASCADE')
-      table.timestamp('starts_at').notNullable().defaultTo(this.now())
+      table.timestamp('publish_at').notNullable().defaultTo(this.now())
       table.timestamp('ends_at').nullable()
       table.timestamps(true, true)
     })

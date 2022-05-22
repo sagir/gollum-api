@@ -27,7 +27,7 @@ export class SurveyService {
         })
         break
       case SurveyStatuses.Unpublished:
-        query.where('publish_at', '<', nowSql)
+        query.where((q) => q.whereNull('publish_at').orWhere('publish_at', '<', nowSql))
         break
     }
 

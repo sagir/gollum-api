@@ -20,7 +20,7 @@ export default class Survey extends BaseModel {
   public userId: number
 
   @column.dateTime()
-  public startsAt: DateTime
+  public publishAt?: DateTime
 
   @column.dateTime()
   public endsAt?: DateTime

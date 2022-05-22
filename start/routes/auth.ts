@@ -4,4 +4,6 @@ Route.group(() => {
   Route.post('register', 'AuthController.register').as('register')
   Route.post('login', 'AuthController.login').as('login')
   Route.post('refresh-token', 'AuthController.refreshToken').as('refreshToken')
-}).prefix('api/v1/auth')
+})
+  .prefix('api/v1/auth')
+  .as('api.v1.auth')

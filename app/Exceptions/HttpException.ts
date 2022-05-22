@@ -12,4 +12,4 @@ import { Exception } from '@adonisjs/core/build/standalone'
 | new BadRequestException('message', 500, 'E_RUNTIME_EXCEPTION')
 |
 */
-export default class BadRequestException extends Exception {}
+export default class HttpException extends Exception {}

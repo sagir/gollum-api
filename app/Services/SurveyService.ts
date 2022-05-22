@@ -77,4 +77,10 @@ export class SurveyService {
       )
     }
   }
+
+  public static blockIfPublished(survey: Survey): void {
+    if (survey.publishAt) {
+      throw new HttpException("Published surveys can't be updated/deleted", 400, 'E_BAD_REQUEST')
+    }
+  }
 }

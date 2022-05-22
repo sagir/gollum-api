@@ -6,7 +6,6 @@ import Survey from 'App/Models/Survey'
 import SurveyListRequestValidator from './../../Validators/SurveyListRequestValidator'
 import { SurveyService } from './../../Services/SurveyService'
 import SurveyValidator from 'App/Validators/SurveyValidator'
-import HttpException from './../../Exceptions/HttpException'
 
 export default class SurveysController {
   public async index({ request }: HttpContextContract): Promise<ModelPaginatorContract<Survey>> {
@@ -44,6 +43,7 @@ export default class SurveysController {
   public async update({ auth, params, request, response }: HttpContextContract): Promise<void> {
     const survey = await Survey.findOrFail(params.id)
     SurveyService.authorize(survey, auth.user)
+    SurveyService.blockIfPublished(survey)
     await request.validate(SurveyValidator)
 
     survey.title = request.input('title')
@@ -57,6 +57,7 @@ export default class SurveysController {
   public async destroy({ auth, params, response }: HttpContextContract): Promise<void> {
     const survey = await Survey.findOrFail(params.id)
     SurveyService.authorize(survey, auth.user)
+    SurveyService.blockIfPublished(survey)
     await survey.delete()
     response.noContent()
   }

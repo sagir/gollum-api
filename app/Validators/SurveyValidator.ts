@@ -1,7 +1,7 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class CreateSurveyValidator {
+export default class SurveyValidator {
   constructor(protected ctx: HttpContextContract) {}
 
   /*

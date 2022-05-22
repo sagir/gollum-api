@@ -9,7 +9,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { DateTime } from 'luxon'
 import RefreshToken from './../../Models/RefreshToken'
 import { TokenResponse } from './../../Responses/TokenResponse'
-import BadRequestException from './../../Exceptions/BadRequestException'
+import HttpException from '../../Exceptions/HttpException'
 
 export default class AuthController {
   public async register({ auth, request }: HttpContextContract): Promise<LoginResponse> {
@@ -35,7 +35,7 @@ export default class AuthController {
       return { user, token, refreshToken }
     }
 
-    throw new BadRequestException("Username or password didn't match", 400, 'E_INVALID_CREDENTIALS')
+    throw new HttpException("Username or password didn't match", 400, 'E_INVALID_CREDENTIALS')
   }
 
   public async refreshToken({ auth, request }: HttpContextContract): Promise<TokenResponse> {
@@ -57,6 +57,6 @@ export default class AuthController {
       return { token, refreshToken }
     }
 
-    throw new BadRequestException('Invalid token.', 400, 'E_INVALID_TOKEN')
+    throw new HttpException('Invalid token.', 400, 'E_INVALID_TOKEN')
   }
 }

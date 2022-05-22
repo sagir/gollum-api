@@ -5,7 +5,8 @@ import { SurveyStatuses } from 'App/Enums/SurveyStatuses'
 import Survey from 'App/Models/Survey'
 import SurveyListRequestValidator from './../../Validators/SurveyListRequestValidator'
 import { SurveyService } from './../../Services/SurveyService'
-import CreateSurveyValidator from 'App/Validators/CreateSurveyValidator'
+import SurveyValidator from 'App/Validators/SurveyValidator'
+import HttpException from './../../Exceptions/HttpException'
 
 export default class SurveysController {
   public async index({ request }: HttpContextContract): Promise<ModelPaginatorContract<Survey>> {
@@ -20,7 +21,7 @@ export default class SurveysController {
   }
 
   public async store({ auth, request, response }: HttpContextContract): Promise<void> {
-    await request.validate(CreateSurveyValidator)
+    await request.validate(SurveyValidator)
 
     const survey = await Survey.create({
       title: request.input('title'),
@@ -40,7 +41,24 @@ export default class SurveysController {
       .firstOrFail()
   }
 
-  public async update({}: HttpContextContract) {}
+  public async update({ auth, params, request, response }: HttpContextContract): Promise<void> {
+    const survey = await Survey.findOrFail(params.id)
+
+    if (survey.userId !== auth.user?.id) {
+      throw new HttpException(
+        'You are not authorized to update this survey',
+        403,
+        'E_AUTHORIZATION'
+      )
+    }
+
+    await request.validate(SurveyValidator)
+    survey.title = request.input('title')
+    survey.description = request.input('description')
+    survey.timeLimit = request.input('timeLimit')
+    await survey.save()
+    response.noContent()
+  }
 
   public async destroy({}: HttpContextContract) {}
 }

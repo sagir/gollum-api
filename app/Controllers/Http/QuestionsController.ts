@@ -43,7 +43,8 @@ export default class QuestionsController {
     await request.validate(QuestionValidator)
     await QuestionService.saveQuestion(
       survey,
-      request.only(['text', 'answerType', 'options']) as QuestionDto
+      request.only(['text', 'answerType', 'options']) as QuestionDto,
+      question
     )
 
     response.noContent()

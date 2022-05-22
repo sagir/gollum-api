@@ -6,6 +6,8 @@ import Survey from 'App/Models/Survey'
 import SurveyListRequestValidator from './../../Validators/SurveyListRequestValidator'
 import { SurveyService } from './../../Services/SurveyService'
 import SurveyValidator from 'App/Validators/SurveyValidator'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import { DateTime } from 'luxon'
 
 export default class SurveysController {
   public async index({ request }: HttpContextContract): Promise<ModelPaginatorContract<Survey>> {
@@ -60,5 +62,23 @@ export default class SurveysController {
     SurveyService.blockIfPublished(survey)
     await survey.delete()
     response.noContent()
+  }
+
+  public async publish({ auth, params, request, response }: HttpContextContract): Promise<void> {
+    const survey = await Survey.query().withCount('questions').where('id', params.id).firstOrFail()
+    SurveyService.authorize(survey, auth.user)
+    SurveyService.blockIfPublished(survey, 'Survey is already published')
+
+    await request.validate({
+      schema: schema.create({
+        endsAt: schema.date({ format: 'iso' }, [rules.required(), rules.after('today')]),
+      }),
+    })
+
+    const endsAt = request.input('endsAt')
+    survey.publishAt = DateTime.now()
+    survey.endsAt = endsAt ? DateTime.fromISO(endsAt) : undefined
+    await survey.save()
+    return response.noContent()
   }
 }

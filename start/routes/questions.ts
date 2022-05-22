@@ -9,3 +9,4 @@ Route.group(() => {
 })
   .prefix('api/v1')
   .as('api.v1.questions')
+  .middleware('auth')

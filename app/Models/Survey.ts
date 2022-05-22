@@ -1,5 +1,13 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  BelongsTo,
+  belongsTo,
+  column,
+  HasMany,
+  hasMany,
+  scope,
+} from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Question from './Question'
 
@@ -36,4 +44,33 @@ export default class Survey extends BaseModel {
 
   @hasMany(() => Question)
   public questions: HasMany<typeof Question>
+
+  // query scopes
+  public static finished = scope((query) => {
+    query.where((q) => {
+      q.whereNotNull('ends_at').andWhere('ends_at', '<=', DateTime.now().toSQL())
+    })
+  })
+
+  public static published = scope((query) => {
+    query.where((q) =>
+      q.whereNotNull('publish_at').andWhere('publish_at', '>=', DateTime.now().toSQL())
+    )
+  })
+
+  public static active = scope((query) => {
+    query.where((q1) => {
+      q1.whereNotNull('publish_at')
+        .andWhere('publish_at', '>=', DateTime.now().toSQL())
+        .andWhere((q2) => {
+          q2.whereNull('ends_at').orWhere('ends_at', '>', DateTime.now().toSQL())
+        })
+    })
+  })
+
+  public static unpublished = scope((query) => {
+    query.where((q) => {
+      q.whereNull('publish_at').orWhere('publish_at', '<', DateTime.now().toSQL())
+    })
+  })
 }

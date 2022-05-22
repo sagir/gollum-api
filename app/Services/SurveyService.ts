@@ -14,22 +14,19 @@ export class SurveyService {
     status: SurveyStatuses
   ) {
     const query = Survey.query().withCount('questions')
-    const nowSql = DateTime.now().toSQL()
 
     switch (status) {
       case SurveyStatuses.Finished:
-        query.whereNotNull('ends_at').andWhere('ends_at', '<=', nowSql)
+        query.withScopes((q) => q.finished())
         break
       case SurveyStatuses.Published:
-        query.where('publish_at', '>=', nowSql)
+        query.withScopes((q) => q.published())
         break
       case SurveyStatuses.Active:
-        query.where('publish_at', '>=', nowSql).andWhere((q) => {
-          q.whereNull('ends_at').orWhere('ends_at', '>', nowSql)
-        })
+        query.withScopes((q) => q.active())
         break
       case SurveyStatuses.Unpublished:
-        query.where((q) => q.whereNull('publish_at').orWhere('publish_at', '<', nowSql))
+        query.withScopes((q) => q.unpublished())
         break
     }
 

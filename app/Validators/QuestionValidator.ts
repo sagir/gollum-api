@@ -1,5 +1,6 @@
-import { schema } from '@ioc:Adonis/Core/Validator'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { AnswerTypes } from 'App/Enums/AnswerTypes'
 
 export default class QuestionValidator {
   constructor(protected ctx: HttpContextContract) {}
@@ -23,7 +24,25 @@ export default class QuestionValidator {
    *     ])
    *    ```
    */
-  public schema = schema.create({})
+  public schema = schema.create({
+    text: schema.string({ trim: true }, [
+      rules.required(),
+      rules.minLength(3),
+      rules.maxLength(255),
+    ]),
+    answerType: schema.enum(Object.values(AnswerTypes), [rules.required()]),
+    options: schema
+      .array([rules.requiredWhen('answerType', '!=', AnswerTypes.Text), rules.minLength(1)])
+      .members(
+        schema.object([rules.required()]).members({
+          text: schema.string({ trim: true }, [
+            rules.required(),
+            rules.minLength(3),
+            rules.maxLength(255),
+          ]),
+        })
+      ),
+  })
 
   /**
    * Custom messages for validation failures. You can make use of dot notation `(.)`

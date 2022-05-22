@@ -43,22 +43,21 @@ export default class SurveysController {
 
   public async update({ auth, params, request, response }: HttpContextContract): Promise<void> {
     const survey = await Survey.findOrFail(params.id)
-
-    if (survey.userId !== auth.user?.id) {
-      throw new HttpException(
-        'You are not authorized to update this survey',
-        403,
-        'E_AUTHORIZATION'
-      )
-    }
-
+    SurveyService.authorize(survey, auth.user)
     await request.validate(SurveyValidator)
+
     survey.title = request.input('title')
     survey.description = request.input('description')
     survey.timeLimit = request.input('timeLimit')
+
     await survey.save()
     response.noContent()
   }
 
-  public async destroy({}: HttpContextContract) {}
+  public async destroy({ auth, params, response }: HttpContextContract): Promise<void> {
+    const survey = await Survey.findOrFail(params.id)
+    SurveyService.authorize(survey, auth.user)
+    await survey.delete()
+    response.noContent()
+  }
 }

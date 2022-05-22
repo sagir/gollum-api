@@ -1,6 +1,8 @@
 import { SurveySortOptions } from 'App/Enums/SurveySortOptions'
 import { SurveyStatuses } from 'App/Enums/SurveyStatuses'
+import HttpException from 'App/Exceptions/HttpException'
 import Survey from 'App/Models/Survey'
+import User from 'App/Models/User'
 import { DateTime } from 'luxon'
 
 export class SurveyService {
@@ -64,5 +66,15 @@ export class SurveyService {
     }
 
     return query.orderBy(sortByColumn, sortByDirection).paginate(page, perPage)
+  }
+
+  public static authorize(survey: Survey, user?: User): void {
+    if (!user || user.id !== survey.userId) {
+      throw new HttpException(
+        'You are not authorized to update this survey',
+        403,
+        'E_AUTHORIZATION'
+      )
+    }
   }
 }

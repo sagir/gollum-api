@@ -18,7 +18,8 @@ export default class SurveysController {
       Number(request.input('perPage', 10)),
       request.input('search', ''),
       request.input('sortBy', SurveySortOptions.Latest),
-      request.input('status', SurveyStatuses.All)
+      request.input('status', SurveyStatuses.All),
+      Number(request.input('user'))
     )
   }
 

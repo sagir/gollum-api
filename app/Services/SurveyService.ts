@@ -3,7 +3,6 @@ import { SurveyStatuses } from 'App/Enums/SurveyStatuses'
 import HttpException from 'App/Exceptions/HttpException'
 import Survey from 'App/Models/Survey'
 import User from 'App/Models/User'
-import { DateTime } from 'luxon'
 
 export class SurveyService {
   public static getList(
@@ -11,7 +10,8 @@ export class SurveyService {
     perPage: number,
     search: string,
     sortBy: SurveySortOptions,
-    status: SurveyStatuses
+    status: SurveyStatuses,
+    user?: number
   ) {
     const query = Survey.query().withCount('questions')
 
@@ -60,6 +60,10 @@ export class SurveyService {
         sortByColumn = 'title'
         sortByDirection = 'asc'
         break
+    }
+
+    if (user) {
+      query.where('user_id', user)
     }
 
     return query.orderBy(sortByColumn, sortByDirection).paginate(page, perPage)

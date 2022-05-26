@@ -31,6 +31,7 @@ export default class SurveyListRequestValidator {
     search: schema.string.optional(),
     sortBy: schema.enum.optional(Object.values(SurveySortOptions)),
     status: schema.enum.optional(Object.values(SurveyStatuses)),
+    user: schema.number.optional([rules.unsigned(), rules.range(1, Number.MIN_SAFE_INTEGER)]),
   })
 
   /**

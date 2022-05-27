@@ -12,6 +12,8 @@ import User from './User'
 import Question from './Question'
 
 export default class Survey extends BaseModel {
+  public serializeExtras = true
+
   @column({ isPrimary: true })
   public id: number
 

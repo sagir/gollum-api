@@ -13,7 +13,7 @@ import HttpException from 'App/Exceptions/HttpException'
 export default class SurveysController {
   public async index({ request }: HttpContextContract): Promise<ModelPaginatorContract<Survey>> {
     await request.validate(SurveyListRequestValidator)
-    return SurveyService.getList(
+    const res = await SurveyService.getList(
       Number(request.input('page', 1)),
       Number(request.input('perPage', 10)),
       request.input('search', ''),
@@ -21,6 +21,7 @@ export default class SurveysController {
       request.input('status', SurveyStatuses.All),
       Number(request.input('user'))
     )
+    return res
   }
 
   public async store({ auth, request, response }: HttpContextContract): Promise<void> {

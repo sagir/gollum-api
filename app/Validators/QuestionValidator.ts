@@ -32,15 +32,13 @@ export default class QuestionValidator {
     ]),
     answerType: schema.enum(Object.values(AnswerTypes), [rules.required()]),
     options: schema
-      .array([rules.requiredWhen('answerType', '!=', AnswerTypes.Text), rules.minLength(1)])
+      .array([
+        rules.requiredWhen('answerType', '!=', AnswerTypes.Text),
+        rules.minLength(1),
+        rules.maxLength(4),
+      ])
       .members(
-        schema.object([rules.required()]).members({
-          text: schema.string({ trim: true }, [
-            rules.required(),
-            rules.minLength(3),
-            rules.maxLength(255),
-          ]),
-        })
+        schema.string({ trim: true }, [rules.required(), rules.minLength(3), rules.maxLength(255)])
       ),
   })
 

@@ -35,8 +35,8 @@ export default class SurveyListRequestValidator {
       rules.range(1, Number.MAX_SAFE_INTEGER),
     ]),
     search: schema.string.nullableAndOptional(),
-    sortBy: schema.enum.nullableAndOptional(Object.values(SurveySortOptions)),
-    status: schema.enum.nullableAndOptional(Object.values(SurveyStatuses)),
+    sortBy: schema.enum.nullableAndOptional(['all', ...Object.values(SurveySortOptions)]),
+    status: schema.enum.nullableAndOptional(['all', ...Object.values(SurveyStatuses)]),
     user: schema.number.nullableAndOptional([
       rules.unsigned(),
       rules.range(1, Number.MAX_SAFE_INTEGER),

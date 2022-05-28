@@ -4,12 +4,14 @@ import {
   BelongsTo,
   belongsTo,
   column,
+  computed,
   HasMany,
   hasMany,
   scope,
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Question from './Question'
+import { SurveyStatuses } from 'App/Enums/SurveyStatuses'
 
 export default class Survey extends BaseModel {
   public serializeExtras = true
@@ -47,6 +49,25 @@ export default class Survey extends BaseModel {
   @hasMany(() => Question)
   public questions: HasMany<typeof Question>
 
+  @computed()
+  public get status() {
+    const now = DateTime.now()
+
+    if (this.endsAt && this.publishAt && this.endsAt > now && this.publishAt < now) {
+      return SurveyStatuses.Active
+    }
+
+    if (this.endsAt && this.endsAt <= now) {
+      return SurveyStatuses.Finished
+    }
+
+    if (this.publishAt && this.publishAt >= DateTime.now()) {
+      return SurveyStatuses.Published
+    }
+
+    return SurveyStatuses.Unpublished
+  }
+
   // query scopes
   public static finished = scope((query) => {
     query.where((q) => {
@@ -56,14 +77,14 @@ export default class Survey extends BaseModel {
 
   public static published = scope((query) => {
     query.where((q) =>
-      q.whereNotNull('publish_at').andWhere('publish_at', '>=', DateTime.now().toSQL())
+      q.whereNotNull('publish_at').andWhere('publish_at', '<', DateTime.now().toSQL())
     )
   })
 
   public static active = scope((query) => {
     query.where((q1) => {
       q1.whereNotNull('publish_at')
-        .andWhere('publish_at', '>=', DateTime.now().toSQL())
+        .andWhere('publish_at', '<', DateTime.now().toSQL())
         .andWhere((q2) => {
           q2.whereNull('ends_at').orWhere('ends_at', '>', DateTime.now().toSQL())
         })

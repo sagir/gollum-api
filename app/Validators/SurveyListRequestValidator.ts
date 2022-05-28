@@ -26,12 +26,21 @@ export default class SurveyListRequestValidator {
    *    ```
    */
   public schema = schema.create({
-    page: schema.number.optional([rules.unsigned(), rules.range(1, Number.MAX_SAFE_INTEGER)]),
-    perPage: schema.number.optional([rules.unsigned(), rules.range(1, Number.MAX_SAFE_INTEGER)]),
-    search: schema.string.optional(),
-    sortBy: schema.enum.optional(Object.values(SurveySortOptions)),
-    status: schema.enum.optional(Object.values(SurveyStatuses)),
-    user: schema.number.optional([rules.unsigned(), rules.range(1, Number.MAX_SAFE_INTEGER)]),
+    page: schema.number.nullableAndOptional([
+      rules.unsigned(),
+      rules.range(1, Number.MAX_SAFE_INTEGER),
+    ]),
+    perPage: schema.number.nullableAndOptional([
+      rules.unsigned(),
+      rules.range(1, Number.MAX_SAFE_INTEGER),
+    ]),
+    search: schema.string.nullableAndOptional(),
+    sortBy: schema.enum.nullableAndOptional(Object.values(SurveySortOptions)),
+    status: schema.enum.nullableAndOptional(Object.values(SurveyStatuses)),
+    user: schema.number.nullableAndOptional([
+      rules.unsigned(),
+      rules.range(1, Number.MAX_SAFE_INTEGER),
+    ]),
   })
 
   /**

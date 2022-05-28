@@ -29,7 +29,7 @@ export default class SurveyValidator {
       rules.minLength(3),
       rules.maxLength(255),
     ]),
-    description: schema.string.optional({ trim: true }, [
+    description: schema.string.nullableAndOptional({ trim: true }, [
       rules.minLength(10),
       rules.maxLength(2000),
     ]),

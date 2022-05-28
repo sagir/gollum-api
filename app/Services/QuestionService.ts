@@ -9,17 +9,19 @@ export class QuestionService {
   public static async saveQuestion(
     survey: Survey,
     questionDto: QuestionDto,
-    question?: Question
+    questionModel?: Question
   ): Promise<Question> {
     const trx = await Database.transaction()
+    let question: Question
 
     try {
-      if (!question) {
+      if (!questionModel) {
         question = await survey.useTransaction(trx).related('questions').create({
           text: questionDto.text,
           answerType: questionDto.answerType,
         })
       } else {
+        question = questionModel
         question.text = questionDto.text
         question.answerType = questionDto.answerType
         await question.useTransaction(trx).save()
@@ -27,7 +29,10 @@ export class QuestionService {
 
       await question.related('options').query().useTransaction(trx).delete().exec()
       if (question.answerType !== AnswerTypes.Text) {
-        await question.useTransaction(trx).related('options').createMany(questionDto.options)
+        await question
+          .useTransaction(trx)
+          .related('options')
+          .createMany(questionDto.options.map((text) => ({ text })))
       }
 
       await trx.commit()

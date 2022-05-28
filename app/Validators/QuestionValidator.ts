@@ -34,11 +34,11 @@ export default class QuestionValidator {
     options: schema
       .array([
         rules.requiredWhen('answerType', '!=', AnswerTypes.Text),
-        rules.minLength(1),
+        rules.minLength(2),
         rules.maxLength(4),
       ])
       .members(
-        schema.string({ trim: true }, [rules.required(), rules.minLength(3), rules.maxLength(255)])
+        schema.string({ trim: true }, [rules.required(), rules.minLength(1), rules.maxLength(255)])
       ),
   })
 

@@ -65,7 +65,7 @@ export default class SurveysController {
     response.noContent()
   }
 
-  public async publish({ auth, params, request, response }: HttpContextContract): Promise<void> {
+  public async publish({ auth, params, response }: HttpContextContract): Promise<void> {
     const survey = await Survey.query().withCount('questions').where('id', params.id).firstOrFail()
     SurveyService.authorize(survey, auth.user)
     SurveyService.blockIfPublished(survey, 'Survey is already published')

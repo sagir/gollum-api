@@ -34,13 +34,14 @@ export class QuestionService {
           .related('options')
           .createMany(questionDto.options.map((text) => ({ text })))
 
-        options.forEach((option) => question.options.push(option))
+        // options.forEach((option) => question.options.push(option))
       }
 
       await trx.commit()
-      //await question.load('options')
+      await question.load('options')
       return question
     } catch (error) {
+      console.error(error)
       await trx.rollback()
       throw new HttpException(
         'Something went wrong. Please try again later.',

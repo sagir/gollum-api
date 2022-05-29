@@ -38,6 +38,9 @@ export default class QuestionsController {
       throw new HttpException('Question Not found.', 404, 'E_NOT_FOUND')
     }
 
+    const question = questions.at(index) as Question
+    await question.load('options')
+
     return {
       question: questions.at(index) as Question,
       nextQuestionId: questions.at(index + 1)?.id,

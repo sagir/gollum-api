@@ -14,7 +14,12 @@ export class SurveyService {
     status: SurveyStatuses,
     user?: number
   ): Promise<ModelPaginatorContract<Survey>> {
-    const query = Survey.query().withCount('questions').preload('user')
+    const query = Survey.query()
+      .withCount('questions')
+      .preload('user')
+      .withAggregate('answers', (query) => {
+        query.count('*').as('total_taken').groupBy('user_id')
+      })
 
     switch (status) {
       case SurveyStatuses.Finished:

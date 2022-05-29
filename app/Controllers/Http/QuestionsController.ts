@@ -1,9 +1,11 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { QuestionDto } from 'App/Dtos/QuestionDto'
+import Question from 'App/Models/Question'
 import Survey from 'App/Models/Survey'
 import { QuestionService } from 'App/Services/QuestionService'
 import { SurveyService } from 'App/Services/SurveyService'
 import QuestionValidator from 'App/Validators/QuestionValidator'
+import HttpException from './../../Exceptions/HttpException'
 
 export default class QuestionsController {
   public async store({ auth, params, request, response }: HttpContextContract): Promise<void> {
@@ -22,6 +24,25 @@ export default class QuestionsController {
     )
 
     response.created(question)
+  }
+
+  public async getQuestion({ params }: HttpContextContract): Promise<{
+    question: Question
+    nextQuestionId?: number
+    previousQuestionId?: number
+  }> {
+    const questions = await Question.query().andWhere('survey_id', params.surveyId).exec()
+    const index = questions.findIndex(({ id }) => id === Number(params.questionId))
+
+    if (index === -1) {
+      throw new HttpException('Question Not found.', 404, 'E_NOT_FOUND')
+    }
+
+    return {
+      question: questions.at(index) as Question,
+      nextQuestionId: questions.at(index + 1)?.id,
+      previousQuestionId: index ? questions.at(index - 1)?.id : undefined,
+    }
   }
 
   public async update({ auth, params, request, response }: HttpContextContract): Promise<void> {

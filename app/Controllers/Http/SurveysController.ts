@@ -70,7 +70,7 @@ export default class SurveysController {
     SurveyService.authorize(survey, auth.user)
     SurveyService.blockIfPublished(survey, 'Survey is already published')
 
-    if (!survey.$extras.questionsCount) {
+    if (!survey.$extras.questions_count) {
       throw new HttpException(
         'Pleaes add at-least 1 question before publishing it.',
         400,

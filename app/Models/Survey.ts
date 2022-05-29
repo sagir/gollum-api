@@ -61,7 +61,7 @@ export default class Survey extends BaseModel {
       return SurveyStatuses.Finished
     }
 
-    if (this.publishAt && this.publishAt >= DateTime.now()) {
+    if (this.publishAt && this.publishAt <= DateTime.now()) {
       return SurveyStatuses.Published
     }
 

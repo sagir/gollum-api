@@ -8,7 +8,7 @@ export default class Questions extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
       table.string('text', 255).notNullable()
-      table.enum('answer_type', Object.values(AnswerTypes))
+      table.enum('answer_type', Object.values(AnswerTypes).slice(3, 6))
       table
         .integer('survey_id')
         .notNullable()

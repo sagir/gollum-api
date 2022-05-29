@@ -29,12 +29,10 @@ export class QuestionService {
 
       await question.related('options').query().useTransaction(trx).delete().exec()
       if (question.answerType !== AnswerTypes.Text) {
-        const options = await question
+        await question
           .useTransaction(trx)
           .related('options')
           .createMany(questionDto.options.map((text) => ({ text })))
-
-        // options.forEach((option) => question.options.push(option))
       }
 
       await trx.commit()

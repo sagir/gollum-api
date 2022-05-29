@@ -32,7 +32,7 @@ export default class AuthController {
 
     if (user && (await Hash.verify(user.password, request.input('password')))) {
       const { token, refreshToken } = await UserService.generateTokens(user, auth)
-      return { user, token, refreshToken }
+      return { user, token, refreshToken: refreshToken }
     }
 
     throw new HttpException("Username or password didn't match", 400, 'E_INVALID_CREDENTIALS')

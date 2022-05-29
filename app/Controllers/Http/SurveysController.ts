@@ -1,25 +1,25 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { ModelPaginatorContract } from '@ioc:Adonis/Lucid/Orm'
 import { SurveySortOptions } from 'App/Enums/SurveySortOptions'
-import { SurveyStatuses } from 'App/Enums/SurveyStatuses'
 import Survey from 'App/Models/Survey'
 import SurveyListRequestValidator from './../../Validators/SurveyListRequestValidator'
 import { SurveyService } from './../../Services/SurveyService'
 import SurveyValidator from 'App/Validators/SurveyValidator'
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { DateTime } from 'luxon'
 import HttpException from 'App/Exceptions/HttpException'
 
 export default class SurveysController {
   public async index({ request }: HttpContextContract): Promise<ModelPaginatorContract<Survey>> {
     await request.validate(SurveyListRequestValidator)
-    return SurveyService.getList(
+    const res = await SurveyService.getList(
       Number(request.input('page', 1)),
       Number(request.input('perPage', 10)),
       request.input('search', ''),
       request.input('sortBy', SurveySortOptions.Latest),
-      request.input('status', SurveyStatuses.All)
+      request.input('status', 0),
+      Number(request.input('user'))
     )
+    return res
   }
 
   public async store({ auth, request, response }: HttpContextContract): Promise<void> {
@@ -65,12 +65,12 @@ export default class SurveysController {
     response.noContent()
   }
 
-  public async publish({ auth, params, request, response }: HttpContextContract): Promise<void> {
+  public async publish({ auth, params, response }: HttpContextContract): Promise<void> {
     const survey = await Survey.query().withCount('questions').where('id', params.id).firstOrFail()
     SurveyService.authorize(survey, auth.user)
     SurveyService.blockIfPublished(survey, 'Survey is already published')
 
-    if (!survey.$extras.questionsCount) {
+    if (!survey.$extras.questions_count) {
       throw new HttpException(
         'Pleaes add at-least 1 question before publishing it.',
         400,
@@ -78,15 +78,15 @@ export default class SurveysController {
       )
     }
 
-    await request.validate({
-      schema: schema.create({
-        endsAt: schema.date({ format: 'iso' }, [rules.required(), rules.after('today')]),
-      }),
-    })
+    // await request.validate({
+    //   schema: schema.create({
+    //     endsAt: schema.date({ format: 'iso' }, [rules.required(), rules.after('today')]),
+    //   }),
+    // })
 
-    const endsAt = request.input('endsAt')
+    // const endsAt = request.input('endsAt')
     survey.publishAt = DateTime.now()
-    survey.endsAt = endsAt ? DateTime.fromISO(endsAt) : undefined
+    // survey.endsAt = endsAt ? DateTime.fromISO(endsAt) : undefined
     await survey.save()
     return response.noContent()
   }

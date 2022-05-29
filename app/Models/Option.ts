@@ -11,7 +11,7 @@ export default class Option extends BaseModel {
   public text: string
 
   @column()
-  public quesitonId: number
+  public questionId: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

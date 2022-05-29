@@ -6,7 +6,7 @@ Route.group(() => {
   Route.get('/:id', 'SurveysController.show').as('show')
   Route.put('/:id', 'SurveysController.update').as('update').middleware('auth')
   Route.delete('/:id', 'SurveysController.destroy').as('destroy').middleware('auth')
-  Route.patch('/:id/publish', 'SurveyController.publish').as('publish').middleware('auth')
+  Route.patch('/:id/publish', 'SurveysController.publish').as('publish').middleware('auth')
 })
   .prefix('api/v1/surveys')
   .as('api.v1.surveys')

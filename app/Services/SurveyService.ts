@@ -3,7 +3,7 @@ import { SurveyStatuses } from 'App/Enums/SurveyStatuses'
 import HttpException from 'App/Exceptions/HttpException'
 import Survey from 'App/Models/Survey'
 import User from 'App/Models/User'
-import { DateTime } from 'luxon'
+import { ModelPaginatorContract } from '@ioc:Adonis/Lucid/Orm'
 
 export class SurveyService {
   public static getList(
@@ -11,9 +11,10 @@ export class SurveyService {
     perPage: number,
     search: string,
     sortBy: SurveySortOptions,
-    status: SurveyStatuses
-  ) {
-    const query = Survey.query().withCount('questions')
+    status: SurveyStatuses,
+    user?: number
+  ): Promise<ModelPaginatorContract<Survey>> {
+    const query = Survey.query().withCount('questions').preload('user')
 
     switch (status) {
       case SurveyStatuses.Finished:
@@ -60,6 +61,10 @@ export class SurveyService {
         sortByColumn = 'title'
         sortByDirection = 'asc'
         break
+    }
+
+    if (user) {
+      query.where('user_id', user)
     }
 
     return query.orderBy(sortByColumn, sortByDirection).paginate(page, perPage)

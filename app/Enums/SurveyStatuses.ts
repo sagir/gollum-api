@@ -3,5 +3,4 @@ export enum SurveyStatuses {
   Published = 'published',
   Unpublished = 'unpublished',
   Finished = 'finished',
-  All = 'all',
 }

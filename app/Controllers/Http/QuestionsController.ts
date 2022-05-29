@@ -26,7 +26,7 @@ export default class QuestionsController {
     response.created(question)
   }
 
-  public async getQuestion({ params }: HttpContextContract): Promise<{
+  public async show({ params }: HttpContextContract): Promise<{
     question: Question
     nextQuestionId?: number
     previousQuestionId?: number

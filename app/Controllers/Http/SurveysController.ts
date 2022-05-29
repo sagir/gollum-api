@@ -1,12 +1,10 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { ModelPaginatorContract } from '@ioc:Adonis/Lucid/Orm'
 import { SurveySortOptions } from 'App/Enums/SurveySortOptions'
-import { SurveyStatuses } from 'App/Enums/SurveyStatuses'
 import Survey from 'App/Models/Survey'
 import SurveyListRequestValidator from './../../Validators/SurveyListRequestValidator'
 import { SurveyService } from './../../Services/SurveyService'
 import SurveyValidator from 'App/Validators/SurveyValidator'
-import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { DateTime } from 'luxon'
 import HttpException from 'App/Exceptions/HttpException'
 
@@ -18,7 +16,7 @@ export default class SurveysController {
       Number(request.input('perPage', 10)),
       request.input('search', ''),
       request.input('sortBy', SurveySortOptions.Latest),
-      request.input('status', SurveyStatuses.All),
+      request.input('status', 0),
       Number(request.input('user'))
     )
     return res
@@ -80,15 +78,15 @@ export default class SurveysController {
       )
     }
 
-    await request.validate({
-      schema: schema.create({
-        endsAt: schema.date({ format: 'iso' }, [rules.required(), rules.after('today')]),
-      }),
-    })
+    // await request.validate({
+    //   schema: schema.create({
+    //     endsAt: schema.date({ format: 'iso' }, [rules.required(), rules.after('today')]),
+    //   }),
+    // })
 
-    const endsAt = request.input('endsAt')
+    // const endsAt = request.input('endsAt')
     survey.publishAt = DateTime.now()
-    survey.endsAt = endsAt ? DateTime.fromISO(endsAt) : undefined
+    // survey.endsAt = endsAt ? DateTime.fromISO(endsAt) : undefined
     await survey.save()
     return response.noContent()
   }

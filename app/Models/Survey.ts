@@ -7,11 +7,14 @@ import {
   computed,
   HasMany,
   hasMany,
+  HasManyThrough,
+  hasManyThrough,
   scope,
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Question from './Question'
 import { SurveyStatuses } from 'App/Enums/SurveyStatuses'
+import Answer from './Answer'
 
 export default class Survey extends BaseModel {
   public serializeExtras = true
@@ -48,6 +51,9 @@ export default class Survey extends BaseModel {
 
   @hasMany(() => Question)
   public questions: HasMany<typeof Question>
+
+  @hasManyThrough([() => Answer, () => Question])
+  public answers: HasManyThrough<typeof Answer>
 
   @computed()
   public get status() {

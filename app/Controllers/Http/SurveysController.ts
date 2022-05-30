@@ -7,6 +7,10 @@ import { SurveyService } from './../../Services/SurveyService'
 import SurveyValidator from 'App/Validators/SurveyValidator'
 import { DateTime } from 'luxon'
 import HttpException from 'App/Exceptions/HttpException'
+import { schema, rules } from '@ioc:Adonis/Core/Validator'
+import User from 'App/Models/User'
+import { AnswerDto } from 'App/Dtos/AnswerDto'
+import Answer from 'App/Models/Answer'
 
 export default class SurveysController {
   public async index({ request }: HttpContextContract): Promise<ModelPaginatorContract<Survey>> {
@@ -17,7 +21,9 @@ export default class SurveysController {
       request.input('search', ''),
       request.input('sortBy', SurveySortOptions.Latest),
       request.input('status', 0),
-      Number(request.input('user'))
+      Number(request.input('user', 0)),
+      Number(request.input('takenBy', 0)),
+      Number(request.input('notTakenBy', 0))
     )
     return res
   }
@@ -88,6 +94,52 @@ export default class SurveysController {
     survey.publishAt = DateTime.now()
     // survey.endsAt = endsAt ? DateTime.fromISO(endsAt) : undefined
     await survey.save()
+    return response.noContent()
+  }
+
+  public async takeSurvey({ auth, params, request, response }: HttpContextContract): Promise<void> {
+    await Survey.findOrFail(params.id)
+
+    await request.validate({
+      schema: schema.create({
+        answers: schema.array([rules.minLength(1)]).members(
+          schema.object([rules.required()]).members({
+            id: schema.number([rules.required(), rules.unsigned()]),
+            option: schema.array
+              .optional([rules.minLength(1)])
+              .members(schema.number([rules.unsigned()])),
+            answer: schema.string.optional({ trim: true }, [rules.minLength(3)]),
+          })
+        ),
+      }),
+    })
+
+    const user = auth.use('api').user as User
+    const data = request.input('answers') as AnswerDto[]
+
+    const answers: Array<Partial<Answer>> = []
+
+    data.forEach(({ id, options, answer }) => {
+      options
+        ?.filter((item, index) => options.indexOf(item) === index)
+        .forEach((option) => {
+          answers.push({
+            questionId: id,
+            userId: user.id,
+            optionId: option,
+          })
+        })
+
+      if (answer) {
+        answers.push({
+          questionId: id,
+          userId: user.id,
+          answer,
+        })
+      }
+    })
+
+    await Answer.createMany(answers)
     return response.noContent()
   }
 }

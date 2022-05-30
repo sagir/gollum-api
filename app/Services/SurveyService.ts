@@ -12,14 +12,28 @@ export class SurveyService {
     search: string,
     sortBy: SurveySortOptions,
     status: SurveyStatuses,
-    user?: number
+    user?: number,
+    takenBy?: number,
+    notTakenBy?: number
   ): Promise<ModelPaginatorContract<Survey>> {
     const query = Survey.query()
       .withCount('questions')
       .preload('user')
       .withAggregate('answers', (query) => {
-        query.count('*').as('total_taken').groupBy('user_id')
+        query.countDistinct('user_id').as('total_taken')
       })
+
+    if (takenBy) {
+      query.whereHas('answers', (query) => {
+        query.where('user_id', takenBy)
+      })
+    }
+
+    if (notTakenBy) {
+      query.whereDoesntHave('answers', (query) => {
+        query.where('user_id', notTakenBy)
+      })
+    }
 
     switch (status) {
       case SurveyStatuses.Finished:

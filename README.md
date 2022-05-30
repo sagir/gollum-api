@@ -1,5 +1,7 @@
 # gollum-api
 
+You will need Nodev14 or greater and mysql installed in your pc
+
 ### First install dependencies by running:
 ```
 npm install

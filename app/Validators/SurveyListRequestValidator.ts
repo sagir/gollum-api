@@ -41,6 +41,14 @@ export default class SurveyListRequestValidator {
       rules.unsigned(),
       rules.range(1, Number.MAX_SAFE_INTEGER),
     ]),
+    takenBy: schema.number.nullableAndOptional([
+      rules.unsigned(),
+      rules.range(1, Number.MAX_SAFE_INTEGER),
+    ]),
+    notTakenBy: schema.number.nullableAndOptional([
+      rules.unsigned(),
+      rules.range(1, Number.MAX_SAFE_INTEGER),
+    ]),
   })
 
   /**

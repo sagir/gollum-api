@@ -24,9 +24,13 @@ export class SurveyService {
       })
 
     if (takenBy) {
-      query.whereHas('answers', (query) => {
-        query.where('user_id', takenBy)
-      })
+      query
+        .whereHas('answers', (query) => {
+          query.where('user_id', takenBy)
+        })
+        .preload('answers', (query) => {
+          query.where('user_id', takenBy).groupBy('question_id').orderBy('created_at', 'desc')
+        })
     }
 
     if (notTakenBy) {

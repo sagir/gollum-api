@@ -48,7 +48,7 @@ export default class QuestionsController {
     }
   }
 
-  public async update({ auth, params, request, response }: HttpContextContract): Promise<void> {
+  public async update({ auth, params, request }: HttpContextContract): Promise<Question> {
     const survey = await Survey.query()
       .withCount('questions')
       .where('id', params.surveyId)
@@ -57,7 +57,7 @@ export default class QuestionsController {
     SurveyService.authorize(survey, auth.user)
     SurveyService.blockIfPublished(survey, 'Adding question to published survey is not allowed.')
 
-    const question = await survey
+    let question = await survey
       .related('questions')
       .query()
       .preload('options')
@@ -65,13 +65,11 @@ export default class QuestionsController {
       .firstOrFail()
 
     await request.validate(QuestionValidator)
-    await QuestionService.saveQuestion(
+    return await QuestionService.saveQuestion(
       survey,
       request.only(['text', 'answerType', 'options']) as QuestionDto,
       question
     )
-
-    response.noContent()
   }
 
   public async destroy({ auth, params, response }: HttpContextContract): Promise<void> {

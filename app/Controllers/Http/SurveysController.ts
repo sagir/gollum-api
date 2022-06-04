@@ -152,6 +152,7 @@ export default class SurveysController {
       .preload('questions', (query) => {
         query.preload('answers', (query) => query.preload('user')).preload('options')
       })
+      .preload('user')
       .where('id', params.id)
       .firstOrFail()
   }

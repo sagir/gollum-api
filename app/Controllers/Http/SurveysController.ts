@@ -118,8 +118,11 @@ export default class SurveysController {
     const data = request.input('answers') as AnswerDto[]
 
     const answers: Array<Partial<Answer>> = []
+    const questionIds: number[] = []
 
     data.forEach(({ id, options, answer }) => {
+      questionIds.push(id)
+
       options
         ?.filter((item, index) => options.indexOf(item) === index)
         .forEach((option) => {
@@ -139,6 +142,7 @@ export default class SurveysController {
       }
     })
 
+    await Answer.query().whereIn('question_id', questionIds).andWhere('user_id', user.id).delete()
     await Answer.createMany(answers)
     return response.noContent()
   }

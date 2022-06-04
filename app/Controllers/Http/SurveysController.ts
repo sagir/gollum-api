@@ -146,4 +146,13 @@ export default class SurveysController {
     await Answer.createMany(answers)
     return response.noContent()
   }
+
+  public async report({ params }: HttpContextContract): Promise<Survey> {
+    return await Survey.query()
+      .preload('questions', (query) => {
+        query.preload('answers', (query) => query.preload('user')).preload('options')
+      })
+      .where('id', params.id)
+      .firstOrFail()
+  }
 }

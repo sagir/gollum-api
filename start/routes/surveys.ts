@@ -8,6 +8,7 @@ Route.group(() => {
   Route.delete('/:id', 'SurveysController.destroy').as('destroy').middleware('auth')
   Route.patch('/:id/publish', 'SurveysController.publish').as('publish').middleware('auth')
   Route.post('/:id/take-survey', 'SurveysController.takeSurvey').as('takeSurvey').middleware('auth')
+  Route.get('/:id/report', 'SurveysController.report').as('report')
 })
   .prefix('api/v1/surveys')
   .as('api.v1.surveys')

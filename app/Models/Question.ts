@@ -3,6 +3,7 @@ import { BaseModel, BelongsTo, belongsTo, column, HasMany, hasMany } from '@ioc:
 import Survey from './Survey'
 import { AnswerTypes } from 'App/Enums/AnswerTypes'
 import Option from './Option'
+import Answer from './Answer'
 
 export default class Question extends BaseModel {
   @column({ isPrimary: true })
@@ -28,4 +29,7 @@ export default class Question extends BaseModel {
 
   @hasMany(() => Option)
   public options: HasMany<typeof Option>
+
+  @hasMany(() => Answer)
+  public answers: HasMany<typeof Answer>
 }
